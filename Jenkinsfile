@@ -7,7 +7,7 @@ pipeline {
     SID   = 'FA23-BDS-039'
     IMAGE = 'midterm-fa23-bds-039'
     // Switch to qasimalik@gmail.com only for the final graded run
-    MAIL_TO = 'zarocr7@gmail.com'
+    MAIL_TO = 'qasimalik@gmail.com'
   }
 
   stages {
