@@ -6,7 +6,6 @@ pipeline {
   environment {
     SID   = 'FA23-BDS-039'
     IMAGE = 'midterm-fa23-bds-039'
-    // Switch to qasimalik@gmail.com only for the final graded run
     MAIL_TO = 'qasimalik@gmail.com'
   }
 
@@ -43,6 +42,24 @@ pipeline {
           done
           echo "Deployment health check failed"; exit 1
         '''
+      }
+    }
+
+    stage('Push to Docker Hub') {
+      steps {
+        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+          withCredentials([usernamePassword(credentialsId: 'dockerhub-creds',
+                           usernameVariable: 'DH_USER', passwordVariable: 'DH_PASS')]) {
+            sh '''
+              echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
+              docker tag $IMAGE:latest $DH_USER/$IMAGE:latest
+              docker tag $IMAGE:latest $DH_USER/$IMAGE:$GIT_COMMIT
+              docker push $DH_USER/$IMAGE:latest
+              docker push $DH_USER/$IMAGE:$GIT_COMMIT
+              docker logout
+            '''
+          }
+        }
       }
     }
   }
